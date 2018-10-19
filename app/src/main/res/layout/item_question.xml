@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:paddingRight="24dp"
+    android:paddingLeft="24dp"
+    android:paddingBottom="8dp"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:id="@+id/text_question"
+        tools:text="Some question text goes here on multiple lines etc etc "
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <RadioGroup
+        android:orientation="horizontal"
+        android:id="@+id/radiogroup_answers"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </RadioGroup>
+
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:padding="16dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edit_correction"
+                android:textSize="18sp"
+                android:hint="@string/hint_correction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/button_signature"
+                android:drawableRight="@drawable/baseline_navigate_next_black_24"
+                android:gravity="end|center_vertical"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:background="@null"
+                android:text="@string/action_signature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Maintenance</string>
+    <string name="action_back">Back</string>
+    <string name="title_page_first">Page 1/2</string>
+    <string name="action_next">Next</string>
+    <string name="hint_correction">Enter correction</string>
+    <string name="action_signature">Signature</string>
+    <string name="title_page_second">Page 2/2</string>
+    <string name="title_signature">Signature</string>
+    <string name="action_enter_signature">Enter signature</string>
+    <string name="action_home">Home</string>
+    <string name="action_export">Export</string>
+    <string name="title_sign">Sign in the box below</string>
+    <string name="action_done">Done</string>
+    <string name="hint_author">Author</string>
+    <string name="hint_notes">Notes</string>
+    <string name="hint_date">Date</string>
+</resources>
