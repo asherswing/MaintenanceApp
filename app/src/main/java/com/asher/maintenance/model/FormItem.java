@@ -3,7 +3,9 @@ package com.asher.maintenance.model;
 import java.util.HashMap;
 import java.util.List;
 
-public class FormItem {
+import io.realm.RealmObject;
+
+public class FormItem extends RealmObject {
     private String item;
     private HashMap<String, String> answers;
     private boolean allowsNotes;

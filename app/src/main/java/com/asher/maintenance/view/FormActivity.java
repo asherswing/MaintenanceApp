@@ -2,6 +2,7 @@ package com.asher.maintenance.view;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 
 import com.asher.maintenance.R;
 import com.asher.maintenance.adapter.QuestionsAdapter;
+import com.asher.maintenance.model.CompletedForm;
+import com.asher.maintenance.model.CompletedItem;
 import com.asher.maintenance.model.Form;
 import com.asher.maintenance.model.FormItem;
 import com.google.firebase.database.DataSnapshot;
@@ -28,14 +31,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class FormActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class FormActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, QuestionsAdapter.FormCompletionListener {
 
     public static final String EXTRA_FORM = "EXTRA_FORM";
+    public static final String EXTRA_COMPLETED_FORM = "EXTRA_COMPLETED_FORM";
 
     private Form mSelectedForm;
     private List<FormItem> mFormItems = new ArrayList<>();
+    private HashMap<String, String> mCompletedForm = new HashMap<>();
 
     private RecyclerView mRecyclerView;
     private Toolbar mToolbar;
@@ -127,7 +134,7 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-        QuestionsAdapter mAdapter  = new QuestionsAdapter(mFormItems, this);
+        QuestionsAdapter mAdapter  = new QuestionsAdapter(mFormItems, this, this);
         mRecyclerView.setAdapter(mAdapter);
         //   mRecyclerView.setAdapter(adapter);
 
@@ -154,13 +161,39 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public void onNext(View view) {
+
+        CompletedForm completedForm = new CompletedForm();
+        List<CompletedItem> completedItems = new ArrayList<>();
+        for (Map.Entry<String, String> entry : mCompletedForm.entrySet()) {
+            completedItems.add(new CompletedItem(entry.getKey(),entry.getValue()));
+        }
+        if (mSelectedForm.isAllowsNotes()){
+            completedForm.setNotes(mNotesEditText.getText().toString());
+        }
+        if (mSelectedForm.isAllowsDate()) {
+            completedForm.setDate(mDateEditText.getText().toString());
+        }
+        if (mSelectedForm.isAllowsAuthor()){
+            completedForm.setAuthor(mAuthorEditText.getText().toString());
+        }
+        String deviceId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        completedForm.setDeviceId(deviceId);
+        completedForm.setFormId(mSelectedForm.getId());
+        completedForm.setCompletedItems(completedItems);
+
         Intent openSignatureFirstStepActivity = new Intent(this, SignatureFirstStepActivity.class);
+        openSignatureFirstStepActivity.putExtra(EXTRA_COMPLETED_FORM, completedForm);
         startActivity(openSignatureFirstStepActivity);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
         mDateEditText.setText(year+"-"+(month+1)+"-"+dayOfMonth);
+    }
+
+    @Override
+    public void onItemEdited(String item, String answer) {
+        mCompletedForm.put(item, answer);
     }
 }

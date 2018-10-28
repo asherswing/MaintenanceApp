@@ -13,10 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.asher.maintenance.R;
+import com.asher.maintenance.model.CompletedForm;
 
 public class SignatureFirstStepActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
+    private CompletedForm mForm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,10 @@ public class SignatureFirstStepActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (getIntent().hasExtra(FormActivity.EXTRA_COMPLETED_FORM)) {
+            mForm = getIntent().getParcelableExtra(FormActivity.EXTRA_COMPLETED_FORM);
+        }
     }
 
     @Override
@@ -47,6 +53,7 @@ public class SignatureFirstStepActivity extends AppCompatActivity {
 
     public void onSignature(View view) {
         Intent openSignatureSecondStepActivity = new Intent(this, SignatureSecondStepActivity.class);
+        openSignatureSecondStepActivity.putExtra(FormActivity.EXTRA_COMPLETED_FORM, mForm);
         startActivity(openSignatureSecondStepActivity);
     }
 

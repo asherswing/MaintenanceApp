@@ -3,7 +3,10 @@ package com.asher.maintenance.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Form implements Parcelable{
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Form extends RealmObject implements Parcelable{
     private boolean allowsDate;
     private boolean allowsTime;
     private boolean allowsAuthor;
@@ -12,6 +15,7 @@ public class Form implements Parcelable{
     //private List<FormItem> content;
     private String title;
     private String imageUrl;
+    @PrimaryKey
     private int id;
 
     public Form() {
