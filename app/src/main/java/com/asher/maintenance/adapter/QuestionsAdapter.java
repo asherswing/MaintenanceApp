@@ -62,13 +62,17 @@ public class QuestionsAdapter extends
     public void onBindViewHolder(@NonNull final FormItemsViewHolder holder, final int position) {
         holder.questionText.setText(mFormItems.get(position).getItem());
         holder.answersGroup.removeAllViews();
-        if (mFormItems.get(position).getAnswers() != null){
-            for (Map.Entry answer: mFormItems.get(position).getAnswers().entrySet()){
+        if (mFormItems.get(position).getAnswers() != null) {
+            String[] answers = mFormItems.get(position).getAnswers().split(",");
+            for (int i=0; i<answers.length; i++){
+                String answer = answers[i];
                 RadioButton radioButton = new RadioButton(mActivity);
-                radioButton.setText(answer.getValue()+"");
+                radioButton.setText(answer);
                 holder.answersGroup.addView(radioButton);
             }
+
         }
+
       /*  holder.signatureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

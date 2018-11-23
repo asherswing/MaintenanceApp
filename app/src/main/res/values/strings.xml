@@ -15,4 +15,7 @@
     <string name="hint_author">Author</string>
     <string name="hint_notes">Notes</string>
     <string name="hint_date">Date</string>
+    <string name="title_form_progress">Form progress</string>
+    <string name="text_form_progress">Don\'t forget to complete the form so that data gets collected.</string>
+    <string name="title_form_completed">Form completed</string>
 </resources>

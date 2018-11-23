@@ -19,6 +19,7 @@ public class SignatureFirstStepActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private CompletedForm mForm;
+    private String mFormTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,9 @@ public class SignatureFirstStepActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra(FormActivity.EXTRA_COMPLETED_FORM)) {
             mForm = getIntent().getParcelableExtra(FormActivity.EXTRA_COMPLETED_FORM);
+        }
+        if (getIntent().hasExtra("title")){
+            mFormTitle = getIntent().getStringExtra("title");
         }
     }
 
@@ -54,6 +58,7 @@ public class SignatureFirstStepActivity extends AppCompatActivity {
     public void onSignature(View view) {
         Intent openSignatureSecondStepActivity = new Intent(this, SignatureSecondStepActivity.class);
         openSignatureSecondStepActivity.putExtra(FormActivity.EXTRA_COMPLETED_FORM, mForm);
+        openSignatureSecondStepActivity.putExtra("title", mFormTitle);
         startActivity(openSignatureSecondStepActivity);
     }
 

@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class FormItem extends RealmObject {
     private String item;
-    private HashMap<String, String> answers;
+    private String answers;
     private boolean allowsNotes;
     private boolean allowsSignature;
     private int formId;
 
-    public FormItem(String item, HashMap<String, String> answers, boolean allowsNotes, boolean allowsSignature, int formId) {
+    public FormItem(String item, String answers, boolean allowsNotes, boolean allowsSignature, int formId) {
         this.item = item;
         this.answers = answers;
         this.allowsNotes = allowsNotes;
@@ -55,11 +56,11 @@ public class FormItem extends RealmObject {
         this.formId = formId;
     }
 
-    public HashMap<String, String> getAnswers() {
+    public String getAnswers() {
         return answers;
     }
 
-    public void setAnswers(HashMap<String, String> answers) {
+    public void setAnswers(String answers) {
         this.answers = answers;
     }
 }

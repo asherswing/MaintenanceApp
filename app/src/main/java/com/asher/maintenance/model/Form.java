@@ -21,7 +21,9 @@ public class Form extends RealmObject implements Parcelable{
     public Form() {
     }
 
-    public Form(int id, boolean allowsDate, boolean allowsTime, boolean allowsAuthor, boolean allowsNotes, boolean allowsSignature, String title, String imageUrl) {
+    public Form(int id, boolean allowsDate, boolean allowsTime,
+                boolean allowsAuthor, boolean allowsNotes, boolean allowsSignature,
+                String title, String imageUrl) {
         this.id = id;
         this.allowsDate = allowsDate;
         this.allowsTime = allowsTime;

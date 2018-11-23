@@ -1,6 +1,7 @@
 package com.asher.maintenance.view;
 
 import android.app.DatePickerDialog;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -23,6 +24,10 @@ import com.asher.maintenance.model.CompletedForm;
 import com.asher.maintenance.model.CompletedItem;
 import com.asher.maintenance.model.Form;
 import com.asher.maintenance.model.FormItem;
+import com.asher.maintenance.model.FormItemFirebase;
+import com.asher.maintenance.realm.RealmController;
+import com.asher.maintenance.utils.Networking;
+import com.asher.maintenance.utils.NotificationUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +39,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.realm.RealmResults;
 
 public class FormActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, QuestionsAdapter.FormCompletionListener {
 
@@ -48,10 +55,18 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
     private Toolbar mToolbar;
     private EditText mAuthorEditText, mDateEditText, mNotesEditText;
 
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
+
+        NotificationUtils.showNotificationFormInProgress(this);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("notify-one-progress")
+                .child("msg")
+                .setValue("new notification sent "+System.currentTimeMillis());
 
         mRecyclerView = findViewById(R.id.recyclerview_questions);
         mToolbar = findViewById(R.id.toolbar_form);
@@ -65,15 +80,28 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
         mSelectedForm = getIntent().getParcelableExtra(EXTRA_FORM);
         if (mSelectedForm != null ){
             Log.wtf("formselected","id "+mSelectedForm.getId());
-            loadSelectedForm();
+
+            if (Networking.isNetworkConnected(this)){
+                loadSelectedForm();
+            }else{
+                loadFormFromDb();
+            }
+
+
             if (!mSelectedForm.isAllowsAuthor()){
                 mAuthorEditText.setVisibility(View.GONE);
+            }else {
+                mAuthorEditText.setVisibility(View.VISIBLE);
             }
             if (!mSelectedForm.isAllowsDate()){
                 mDateEditText.setVisibility(View.GONE);
+            }else{
+                mDateEditText.setVisibility(View.VISIBLE);
             }
             if (!mSelectedForm.isAllowsNotes()){
                 mNotesEditText.setVisibility(View.GONE);
+            }else {
+                mNotesEditText.setVisibility(View.VISIBLE);
             }
         }
 
@@ -101,16 +129,44 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
 
     }
 
+    private void loadFormFromDb() {
+        mFormItems = new ArrayList<>();
+        RealmResults<FormItem> formItems = RealmController.with(this)
+                .getFormItemsById(mSelectedForm.getId());
+    }
+
     private void loadSelectedForm() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference formsRef = database.getReference("forms").child("formitems"+mSelectedForm.getId());
+        DatabaseReference formsRef = database.getReference("forms")
+                .child("formitems"+mSelectedForm.getId());
         formsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                RealmController.with(FormActivity.this).deleteFormItemsById(mSelectedForm.getId());
                 mFormItems = new ArrayList<>();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    FormItem formItem = postSnapshot.getValue(FormItem.class);
+                    FormItemFirebase formItemFirebase = postSnapshot.getValue(FormItemFirebase.class);
+                    FormItem formItem = new FormItem();
+                    formItem.setItem(formItemFirebase.getItem());
+                    formItem.setAllowsSignature(formItemFirebase.isAllowsSignature());
+                    formItem.setAllowsNotes(formItemFirebase.isAllowsNotes());
+                    formItem.setFormId(formItemFirebase.getFormId());
+                    List<String> answers = new ArrayList<>();
+                    String answersText="";
+                    if (formItemFirebase.getAnswers() != null) {
+                        for (Map.Entry<String, String> entry : formItemFirebase.getAnswers().entrySet()){
+                            answers.add(entry.getValue());
+                            if (answersText.length() != 0) {
+                                answersText += ",";
+                            }
+                            answersText += entry.getValue();
+                        }
+                        formItem.setAnswers(answersText);
+                    }
+
+                    RealmController.with(FormActivity.this)
+                            .insertFormItem(formItem);
+
                     if (formItem != null && !TextUtils.isEmpty(formItem.getItem())) {
                         mFormItems.add(formItem);
                         Log.wtf("form",formItem.getItem());
@@ -125,6 +181,7 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
                 // Getting Post failed, log a message
                 Log.w("selectedformfirebase", "loadPost:onCancelled", databaseError.toException());
                 // ...
+                loadFormFromDb();
             }
         });
 
@@ -184,6 +241,7 @@ public class FormActivity extends AppCompatActivity implements DatePickerDialog.
 
         Intent openSignatureFirstStepActivity = new Intent(this, SignatureFirstStepActivity.class);
         openSignatureFirstStepActivity.putExtra(EXTRA_COMPLETED_FORM, completedForm);
+        openSignatureFirstStepActivity.putExtra("title",mSelectedForm.getTitle());
         startActivity(openSignatureFirstStepActivity);
     }
 
